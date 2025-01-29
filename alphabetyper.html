@@ -1,169 +1,206 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typing Speed Test</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        #alphabetDisplay {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #007bff;
-        }
-
-        #inputBox {
-            padding: 10px;
-            font-size: 18px;
-            width: 100%;
-            margin-bottom: 20px;
-            border: 2px solid #007bff;
-            border-radius: 4px;
-        }
-
-        #status {
-            font-size: 16px;
-            color: #555;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            cursor: pointer;
-            border: none;
-            background-color: #28a745;
-            color: white;
-            border-radius: 4px;
-            margin-top: 10px;
-        }
-
-        button:disabled {
-            background-color: #d6d6d6;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Typing Speed Test</h1>
-        <p>Type the following letters as quickly as possible:</p>
-        <div id="alphabetDisplay">abcdefghijklmnopqrstuvwxyz</div>
-        <input type="text" id="inputBox" placeholder="Start typing here..." autofocus>
-        <p id="status"></p>
-        <p>Time: <span id="timer">0.00</span> seconds</p>
-        <button id="startButton">Start Test</button>
-    </div>
-
-    <script>
-        let alphabet = 'abcdefghijklmnopqrstuvwxyz';
-        let startTime;
-        let timerInterval;
-        let timeElapsed = 0;
-        let typingStarted = false;
-        let lastTimeUpdate = 0; // For tracking time in milliseconds
-
-        const inputBox = document.getElementById('inputBox');
-        const timerDisplay = document.getElementById('timer');
-        const statusDisplay = document.getElementById('status');
-        const startButton = document.getElementById('startButton');
-        const alphabetDisplay = document.getElementById('alphabetDisplay');
-
-        inputBox.disabled = true;
-
-        startButton.addEventListener('click', startTest);
-        inputBox.addEventListener('input', trackInput);
-        inputBox.addEventListener('keydown', checkEnterKey);
-
-        function startTest() {
-            startButton.disabled = true;
-            inputBox.disabled = false;
-            inputBox.value = '';
-            inputBox.focus();
-            statusDisplay.textContent = '';
-            timeElapsed = 0;
-            lastTimeUpdate = Date.now();
-            timerDisplay.textContent = '0.00';
-            typingStarted = false;
-            startTime = Date.now();
-            timerInterval = setInterval(updateTimer, 10); // Update every 10ms
-        }
-
-        function updateTimer() {
-            if (typingStarted) {
-                const now = Date.now();
-                timeElapsed = (now - startTime) / 1000; // Time in seconds (including milliseconds)
-                timerDisplay.textContent = timeElapsed.toFixed(2); // Display time to 2 decimal places
-            }
-        }
-
-        function trackInput() {
-            const typedText = inputBox.value.toLowerCase();
-            
-            // Allow partial progress before complete match
-            if (alphabet.startsWith(typedText)) {
-                if (!typingStarted) {
-                    typingStarted = true;
-                }
-                statusDisplay.textContent = `Keep going...`;
-            } else {
-                statusDisplay.textContent = `Error! Check your input.`;
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AlphabeTyper</title>
+        <style>
+            /* Same CSS as your original code */
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
             }
 
-            // If the entire alphabet is typed correctly
-            if (typedText === alphabet) {
-                clearInterval(timerInterval);
-                statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds. Press the button to restart.`;
-                inputBox.disabled = true;
-                startButton.disabled = false;
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #fff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                text-align: center;
+                color: #333;
             }
-        }
 
-        function checkEnterKey(event) {
-            if (event.key === 'Enter' && inputBox.value.toLowerCase() === alphabet) {
-                clearInterval(timerInterval);
-                statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds. Press the button to restart.`;
-                inputBox.disabled = true;
-                startButton.disabled = false;
+            .container {
+                background-color: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                width: 350px;
             }
-        }
 
-        function resetTest() {
-            inputBox.value = '';
+            h1 {
+                font-size: 28px;
+                margin-bottom: 10px;
+                color: #333;
+            }
+
+            #alphabetDisplay {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 20px;
+                color: #007bff;
+                overflow-wrap: break-word;
+                white-space: normal;
+            }
+
+            #inputBox {
+                padding: 10px;
+                font-size: 18px;
+                width: 100%;
+                margin-bottom: 20px;
+                border: 2px solid #007bff;
+                border-radius: 4px;
+            }
+
+            #status {
+                font-size: 16px;
+                color: #555;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 18px;
+                cursor: pointer;
+                border: none;
+                background-color: #28a745;
+                color: white;
+                border-radius: 4px;
+                margin-top: 10px;
+                transition: background-color 0.3s;
+            }
+
+            button:disabled {
+                background-color: #d6d6d6;
+            }
+
+            button:hover:not(:disabled) {
+                background-color: #218838;
+            }
+
+            header {
+                width: 100%;
+                background-color: #333;
+                padding: 10px 0;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 100;
+            }
+
+            header a {
+                color: white;
+                text-decoration: none;
+                padding: 15px;
+                font-size: 18px;
+                margin: 0 15px;
+            }
+
+            header a:hover {
+                background-color: #444;
+                border-radius: 4px;
+            }
+
+            .main-content {
+                margin-top: 60px;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <a href="alphabetyper.html">Home</a>
+            <a href="daily_redirect.html">Daily Challenge</a>
+        </header>
+
+        <div class="container main-content">
+            <h1>AlphabeTyper</h1>
+            <p>Type the following letters as quickly as possible:</p>
+            <div id="alphabetDisplay">abcdefghijklmnopqrstuvwxyz</div>
+            <input type="text" id="inputBox" placeholder="Start typing here..." autofocus />
+            <p id="status"></p>
+            <p>Time: <span id="timer">0.00</span> seconds</p>
+            <button id="startButton">Start Challenge</button>
+        </div>
+
+        <script>
+            let alphabet = "abcdefghijklmnopqrstuvwxyz";
+            let startTime;
+            let timerInterval;
+            let timeElapsed = 0;
+            let typingStarted = false;
+
+            const inputBox = document.getElementById("inputBox");
+            const timerDisplay = document.getElementById("timer");
+            const statusDisplay = document.getElementById("status");
+            const startButton = document.getElementById("startButton");
+
             inputBox.disabled = true;
-            typingStarted = false;
-            startButton.disabled = false;
-            statusDisplay.textContent = 'Test restarted. Click start to try again.';
-            clearInterval(timerInterval);
-            timerDisplay.textContent = '0.00';
-        }
-    </script>
-</body>
+
+            startButton.addEventListener("click", startTest);
+            inputBox.addEventListener("input", trackInput);
+            inputBox.addEventListener("keydown", checkEnterKey);
+
+            function startTest() {
+                startButton.disabled = true;
+                inputBox.disabled = false;
+                inputBox.value = "";
+                inputBox.focus();
+                statusDisplay.textContent = "";
+                timeElapsed = 0;
+                typingStarted = false;
+                startTime = Date.now();
+                timerInterval = setInterval(updateTimer, 10); // Update every 10ms
+            }
+
+            function updateTimer() {
+                if (typingStarted) {
+                    const now = Date.now();
+                    timeElapsed = (now - startTime) / 1000; // Time in seconds (including milliseconds)
+                    timerDisplay.textContent = timeElapsed.toFixed(2); // Display time to 2 decimal places
+                }
+            }
+
+            function trackInput() {
+                const typedText = inputBox.value.toLowerCase();
+
+                if (alphabet.startsWith(typedText)) {
+                    if (!typingStarted) {
+                        typingStarted = true;
+                    }
+                    statusDisplay.textContent = `Keep going...`;
+                } else {
+                    statusDisplay.textContent = `Error! Check your input.`;
+                }
+
+                // If the entire alphabet is typed correctly
+                if (typedText === alphabet) {
+                    clearInterval(timerInterval);
+                    statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds. Press the button to restart.`;
+                    inputBox.disabled = true;
+                    startButton.disabled = false;
+                }
+            }
+
+            function checkEnterKey(event) {
+                if (event.key === "Enter" && inputBox.value.toLowerCase() === alphabet) {
+                    clearInterval(timerInterval);
+                    statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds. Press the button to restart.`;
+                    inputBox.disabled = true;
+                    startButton.disabled = false;
+                }
+            }
+
+            function resetTest() {
+                inputBox.value = "";
+                inputBox.disabled = true;
+                typingStarted = false;
+                startButton.disabled = false;
+                statusDisplay.textContent = "Test restarted. Click start to try again.";
+                clearInterval(timerInterval);
+                timerDisplay.textContent = "0.00";
+            }
+        </script>
+    </body>
 </html>
