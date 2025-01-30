@@ -129,98 +129,110 @@
         </div>
 
         <script>
-            // Array of daily challenges (this can be expanded later)
-            const dailyChallenges = [
-                { date: "01-28-2025", phrase: "Type as fast as you can, every single day!", isCurrent: false },
-                { date: "01-29-2025", phrase: "Challenge yourself with these typing skills!", isCurrent: true },
-                { date: "01-30-2025", phrase: "Go eat a croissant, it's the National Holiday!", isCurrent: false }
-                // You can add more challenges in the future
-            ];
+    // Array of daily challenges (this can be expanded later)
+    const dailyChallenges = [
+        { date: "01-28-2025", phrase: "Type as fast as you can, every single day!" },
+        { date: "01-29-2025", phrase: "Challenge yourself with these typing skills!" },
+        { date: "01-30-2025", phrase: "Go eat a croissant, it's the National Holiday!" }
+    ];
 
-            // Set the current challenge based on the "isCurrent" flag
-            const currentChallengeIndex = dailyChallenges.findIndex((challenge) => challenge.isCurrent);
-            const inputBox = document.getElementById("inputBox");
-            const timerDisplay = document.getElementById("timer");
-            const statusDisplay = document.getElementById("status");
-            const startButton = document.getElementById("startButton");
-            const dailyChallengeDisplay = document.getElementById("dailyChallenge");
-            const dateDisplay = document.getElementById("date");
+    const inputBox = document.getElementById("inputBox");
+    const timerDisplay = document.getElementById("timer");
+    const statusDisplay = document.getElementById("status");
+    const startButton = document.getElementById("startButton");
+    const dailyChallengeDisplay = document.getElementById("dailyChallenge");
+    const dateDisplay = document.getElementById("date");
 
-            // Timer-related variables
-            let startTime;
-            let timerInterval;
-            let timeElapsed = 0;
-            let typingStarted = false;
+    let startTime;
+    let timerInterval;
+    let timeElapsed = 0;
+    let typingStarted = false;
 
+    inputBox.disabled = true;
+
+    // Convert UTC to Eastern Time (handles EST/EDT automatically)
+    function getEasternDateString() {
+        const now = new Date();
+        const options = { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" };
+        const formatter = new Intl.DateTimeFormat("en-US", options);
+        const parts = formatter.formatToParts(now);
+        
+        const year = parts.find(p => p.type === "year").value;
+        const month = parts.find(p => p.type === "month").value;
+        const day = parts.find(p => p.type === "day").value;
+        
+        return `${month}-${day}-${year}`; // MM-DD-YYYY format
+    }
+
+    // Update and display today's challenge
+    function updateChallenge() {
+        const todayEST = getEasternDateString();
+        const lastUpdate = localStorage.getItem("lastChallengeDate");
+
+        if (lastUpdate !== todayEST) {
+            localStorage.setItem("lastChallengeDate", todayEST);
+            const currentChallenge = dailyChallenges.find(challenge => challenge.date === todayEST);
+
+            if (currentChallenge) {
+                localStorage.setItem("dailyChallenge", currentChallenge.phrase);
+            } else {
+                localStorage.setItem("dailyChallenge", "No challenge for today.");
+            }
+        }
+
+        // Display challenge
+        dailyChallengeDisplay.textContent = localStorage.getItem("dailyChallenge");
+        dateDisplay.textContent = `Date: ${todayEST}`;
+    }
+
+    // Event listeners
+    startButton.addEventListener("click", startTest);
+    inputBox.addEventListener("input", trackInput);
+
+    function startTest() {
+        startButton.disabled = true;
+        inputBox.disabled = false;
+        inputBox.value = "";
+        inputBox.focus();
+        statusDisplay.textContent = "";
+        timeElapsed = 0;
+        typingStarted = false;
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 10); // Update every 10ms
+    }
+
+    function updateTimer() {
+        if (typingStarted) {
+            const now = Date.now();
+            timeElapsed = (now - startTime) / 1000; // Time in seconds (including milliseconds)
+            timerDisplay.textContent = timeElapsed.toFixed(2); // Display time to 2 decimal places
+        }
+    }
+
+    function trackInput() {
+        const typedText = inputBox.value;
+        const currentChallengeText = localStorage.getItem("dailyChallenge");
+
+        if (typedText === currentChallengeText) {
+            clearInterval(timerInterval);
+            statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds.`;
             inputBox.disabled = true;
-
-            // Event listeners
-            startButton.addEventListener("click", startTest);
-            inputBox.addEventListener("input", trackInput);
-
-            function startTest() {
-                startButton.disabled = true;
-                inputBox.disabled = false;
-                inputBox.value = "";
-                inputBox.focus();
-                statusDisplay.textContent = "";
-                timeElapsed = 0;
-                typingStarted = false;
-                startTime = Date.now();
-                timerInterval = setInterval(updateTimer, 10); // Update every 10ms
+            startButton.disabled = false;
+        } else {
+            if (!typingStarted) {
+                typingStarted = true;
             }
-
-            function updateTimer() {
-                if (typingStarted) {
-                    const now = Date.now();
-                    timeElapsed = (now - startTime) / 1000; // Time in seconds (including milliseconds)
-                    timerDisplay.textContent = timeElapsed.toFixed(2); // Display time to 2 decimal places
-                }
+            if (currentChallengeText.startsWith(typedText)) {
+                statusDisplay.textContent = `Keep going...`;
+            } else {
+                statusDisplay.textContent = `Error! Check your input.`;
             }
+        }
+    }
 
-            function trackInput() {
-                const typedText = inputBox.value;
-                const currentChallenge = dailyChallenges[currentChallengeIndex];
+    // Initialize the page with today's challenge
+    updateChallenge();
+</script>
 
-                // Check if the typed text matches the challenge phrase
-                if (typedText === currentChallenge.phrase) {
-                    clearInterval(timerInterval);
-                    statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds.`;
-                    inputBox.disabled = true;
-                    startButton.disabled = false;
-                } else {
-                    if (!typingStarted) {
-                        typingStarted = true;
-                    }
-                    if (currentChallenge.phrase.startsWith(typedText)) {
-                        statusDisplay.textContent = `Keep going...`;
-                    } else {
-                        statusDisplay.textContent = `Error! Check your input.`;
-                    }
-                }
-            }
-
-            // Display the current challenge based on the 'isCurrent' property
-            function displayCurrentChallenge() {
-                const currentChallenge = dailyChallenges[currentChallengeIndex];
-
-                if (currentChallenge) {
-                    dailyChallengeDisplay.textContent = currentChallenge.phrase;
-                    dateDisplay.textContent = currentChallenge.date;
-                    inputBox.disabled = false;
-                    statusDisplay.textContent = "";
-                    timerDisplay.textContent = "0.00";
-                    clearInterval(timerInterval);
-                    timeElapsed = 0;
-                    inputBox.value = "";
-                    inputBox.focus();
-                } else {
-                    dailyChallengeDisplay.textContent = "No challenge for today.";
-                }
-            }
-
-            // Initialize the page by displaying the current challenge
-            displayCurrentChallenge();
-        </script>
     </body>
 </html>
