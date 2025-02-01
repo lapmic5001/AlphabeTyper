@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Daily Typing Challenge</title>
         <style>
-            /* Same CSS as before */
             * {
                 box-sizing: border-box;
                 margin: 0;
@@ -35,6 +34,12 @@
                 font-size: 28px;
                 margin-bottom: 10px;
                 color: #333;
+            }
+
+            #dailyMessage {
+                font-size: 16px;
+                color: #555;
+                margin-bottom: 10px;
             }
 
             #dailyChallenge {
@@ -110,6 +115,14 @@
             .main-content {
                 margin-top: 60px;
             }
+
+            .results {
+                margin-top: 20px;
+                padding: 10px;
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
         </style>
     </head>
     <body>
@@ -120,120 +133,134 @@
 
         <div class="container main-content">
             <h1>Daily Typing Challenge</h1>
+            <div id="dailyMessage">Loading message...</div>
             <div id="dailyChallenge">Loading challenge...</div>
             <div id="date"></div>
             <input type="text" id="inputBox" placeholder="Start typing here..." disabled />
             <p id="status"></p>
             <p>Time: <span id="timer">0.00</span> seconds</p>
             <button id="startButton">Start Challenge</button>
+            <div class="results" id="previousResults">
+                <h2>Previous Results</h2>
+                <ul id="resultsList"></ul>
+            </div>
         </div>
 
         <script>
-    // Array of daily challenges (this can be expanded later)
-    const dailyChallenges = [
-        { date: "01-28-2025", phrase: "Type as fast as you can, every single day!" },
-        { date: "01-29-2025", phrase: "Challenge yourself with these typing skills!" },
-        { date: "01-30-2025", phrase: "Go eat a croissant, it's the National Holiday!" },
-        { date: "01-31-2025", phrase: "Have fun at work today! Or just don't go." }
-    ];
+            const dailyChallenges = [
+                { date: "01-28-2025", message: "Motivation: Stay sharp!", phrase: "Type as fast as you can, every single day!" },
+                { date: "01-29-2025", message: "Tip: Focus on accuracy first.", phrase: "Challenge yourself with these typing skills!" },
+                { date: "01-30-2025", message: "Fun Fact: It's National Croissant Day!", phrase: "Go eat a croissant, it's the National Holiday!" },
+                { date: "01-31-2025", message: "Reminder: Take breaks between typing.", phrase: "Have fun at work today! Or just don't go." },
+                { date: "02-01-2025", message: "Weekend Challenge: Go wild!", phrase: "It is finally Saturday! Type SOMETHING CR4ZY!" },
+                { date: "02-02-2025", message: "But can you do it backward?", phrase: "zyxwvutsrqponmlkjihgfedcba" }
+            ];
 
-    const inputBox = document.getElementById("inputBox");
-    const timerDisplay = document.getElementById("timer");
-    const statusDisplay = document.getElementById("status");
-    const startButton = document.getElementById("startButton");
-    const dailyChallengeDisplay = document.getElementById("dailyChallenge");
-    const dateDisplay = document.getElementById("date");
+            const inputBox = document.getElementById("inputBox");
+            const timerDisplay = document.getElementById("timer");
+            const statusDisplay = document.getElementById("status");
+            const startButton = document.getElementById("startButton");
+            const dailyMessageDisplay = document.getElementById("dailyMessage");
+            const dailyChallengeDisplay = document.getElementById("dailyChallenge");
+            const dateDisplay = document.getElementById("date");
+            const resultsList = document.getElementById("resultsList");
 
-    let startTime;
-    let timerInterval;
-    let timeElapsed = 0;
-    let typingStarted = false;
+            let startTime;
+            let timerInterval;
+            let timeElapsed = 0;
+            let typingStarted = false;
 
-    inputBox.disabled = true;
+            function getEasternDateString() {
+                const now = new Date();
+                const options = { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" };
+                const formatter = new Intl.DateTimeFormat("en-US", options);
+                const parts = formatter.formatToParts(now);
 
-    // Convert UTC to Eastern Time (handles EST/EDT automatically)
-    function getEasternDateString() {
-        const now = new Date();
-        const options = { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" };
-        const formatter = new Intl.DateTimeFormat("en-US", options);
-        const parts = formatter.formatToParts(now);
-        
-        const year = parts.find(p => p.type === "year").value;
-        const month = parts.find(p => p.type === "month").value;
-        const day = parts.find(p => p.type === "day").value;
-        
-        return `${month}-${day}-${year}`; // MM-DD-YYYY format
-    }
+                const year = parts.find(p => p.type === "year").value;
+                const month = parts.find(p => p.type === "month").value;
+                const day = parts.find(p => p.type === "day").value;
 
-    // Update and display today's challenge
-    function updateChallenge() {
-        const todayEST = getEasternDateString();
-        const lastUpdate = localStorage.getItem("lastChallengeDate");
-
-        if (lastUpdate !== todayEST) {
-            localStorage.setItem("lastChallengeDate", todayEST);
-            const currentChallenge = dailyChallenges.find(challenge => challenge.date === todayEST);
-
-            if (currentChallenge) {
-                localStorage.setItem("dailyChallenge", currentChallenge.phrase);
-            } else {
-                localStorage.setItem("dailyChallenge", "No challenge for today.");
+                return `${month}-${day}-${year}`;
             }
-        }
 
-        // Display challenge
-        dailyChallengeDisplay.textContent = localStorage.getItem("dailyChallenge");
-        dateDisplay.textContent = `Date: ${todayEST}`;
-    }
+            function updateChallenge() {
+                const todayEST = getEasternDateString();
+                const currentChallenge = dailyChallenges.find(challenge => challenge.date === todayEST);
 
-    // Event listeners
-    startButton.addEventListener("click", startTest);
-    inputBox.addEventListener("input", trackInput);
-
-    function startTest() {
-        startButton.disabled = true;
-        inputBox.disabled = false;
-        inputBox.value = "";
-        inputBox.focus();
-        statusDisplay.textContent = "";
-        timeElapsed = 0;
-        typingStarted = false;
-        startTime = Date.now();
-        timerInterval = setInterval(updateTimer, 10); // Update every 10ms
-    }
-
-    function updateTimer() {
-        if (typingStarted) {
-            const now = Date.now();
-            timeElapsed = (now - startTime) / 1000; // Time in seconds (including milliseconds)
-            timerDisplay.textContent = timeElapsed.toFixed(2); // Display time to 2 decimal places
-        }
-    }
-
-    function trackInput() {
-        const typedText = inputBox.value;
-        const currentChallengeText = localStorage.getItem("dailyChallenge");
-
-        if (typedText === currentChallengeText) {
-            clearInterval(timerInterval);
-            statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds.`;
-            inputBox.disabled = true;
-            startButton.disabled = false;
-        } else {
-            if (!typingStarted) {
-                typingStarted = true;
+                if (currentChallenge) {
+                    dailyMessageDisplay.textContent = currentChallenge.message;
+                    dailyChallengeDisplay.textContent = currentChallenge.phrase;
+                } else {
+                    dailyMessageDisplay.textContent = "No message for today.";
+                    dailyChallengeDisplay.textContent = "No challenge for today.";
+                }
+                dateDisplay.textContent = `Date: ${todayEST}`;
+                loadPreviousResults(todayEST);
             }
-            if (currentChallengeText.startsWith(typedText)) {
-                statusDisplay.textContent = `Keep going...`;
-            } else {
-                statusDisplay.textContent = `Error! Check your input.`;
+
+            startButton.addEventListener("click", startTest);
+            inputBox.addEventListener("input", trackInput);
+
+            function startTest() {
+                startButton.disabled = true;
+                inputBox.disabled = false;
+                inputBox.value = "";
+                inputBox.focus();
+                statusDisplay.textContent = "";
+                timeElapsed = 0;
+                typingStarted = false;
+                startTime = Date.now();
+                timerInterval = setInterval(updateTimer, 10);
             }
-        }
-    }
 
-    // Initialize the page with today's challenge
-    updateChallenge();
-</script>
+            function updateTimer() {
+                if (typingStarted) {
+                    const now = Date.now();
+                    timeElapsed = (now - startTime) / 1000;
+                    timerDisplay.textContent = timeElapsed.toFixed(2);
+                }
+            }
 
+            function trackInput() {
+                const typedText = inputBox.value;
+                const currentChallengeText = dailyChallengeDisplay.textContent;
+
+                if (typedText === currentChallengeText) {
+                    clearInterval(timerInterval);
+                    statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds.`;
+                    inputBox.disabled = true;
+                    startButton.disabled = false;
+                    saveResult(getEasternDateString(), timeElapsed);
+                } else {
+                    if (!typingStarted) {
+                        typingStarted = true;
+                    }
+                    if (currentChallengeText.startsWith(typedText)) {
+                        statusDisplay.textContent = `Keep going...`;
+                    } else {
+                        statusDisplay.textContent = `Error! Check your input.`;
+                    }
+                }
+            }
+
+            function saveResult(date, time) {
+                const results = JSON.parse(localStorage.getItem("typingResults")) || {};
+                results[date] = time;
+                localStorage.setItem("typingResults", JSON.stringify(results));
+                loadPreviousResults(date);
+            }
+
+            function loadPreviousResults(date) {
+                const results = JSON.parse(localStorage.getItem("typingResults")) || {};
+                resultsList.innerHTML = "";
+                if (results[date]) {
+                    const li = document.createElement("li");
+                    li.textContent = `Date: ${date}, Time: ${results[date].toFixed(2)} seconds`;
+                    resultsList.appendChild(li);
+                }
+            }
+
+            updateChallenge();
+        </script>
     </body>
 </html>
