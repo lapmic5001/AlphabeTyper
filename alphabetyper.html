@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>AlphabeTyper</title>
         <style>
-            /* Same CSS as your original code */
             * {
                 box-sizing: border-box;
                 margin: 0;
@@ -106,6 +105,20 @@
             .main-content {
                 margin-top: 60px;
             }
+
+            #highScores {
+                margin-top: 20px;
+                text-align: left;
+            }
+
+            #highScores h2 {
+                font-size: 20px;
+                color: #333;
+            }
+
+            #highScores ol {
+                padding-left: 20px;
+            }
         </style>
     </head>
     <body>
@@ -122,25 +135,27 @@
             <p id="status"></p>
             <p>Time: <span id="timer">0.00</span> seconds</p>
             <button id="startButton">Start Challenge</button>
+
+            <div id="highScores">
+                <h2>Top Scores:</h2>
+                <ol id="scoreList"></ol>
+            </div>
         </div>
 
         <script>
-            let alphabet = "abcdefghijklmnopqrstuvwxyz";
-            let startTime;
-            let timerInterval;
-            let timeElapsed = 0;
-            let typingStarted = false;
+            const alphabet = "abcdefghijklmnopqrstuvwxyz";
+            let startTime, timerInterval, timeElapsed = 0, typingStarted = false;
 
             const inputBox = document.getElementById("inputBox");
             const timerDisplay = document.getElementById("timer");
             const statusDisplay = document.getElementById("status");
             const startButton = document.getElementById("startButton");
+            const scoreList = document.getElementById("scoreList");
 
             inputBox.disabled = true;
 
             startButton.addEventListener("click", startTest);
             inputBox.addEventListener("input", trackInput);
-            inputBox.addEventListener("keydown", checkEnterKey);
 
             function startTest() {
                 startButton.disabled = true;
@@ -151,14 +166,13 @@
                 timeElapsed = 0;
                 typingStarted = false;
                 startTime = Date.now();
-                timerInterval = setInterval(updateTimer, 10); // Update every 10ms
+                timerInterval = setInterval(updateTimer, 10);
             }
 
             function updateTimer() {
                 if (typingStarted) {
-                    const now = Date.now();
-                    timeElapsed = (now - startTime) / 1000; // Time in seconds (including milliseconds)
-                    timerDisplay.textContent = timeElapsed.toFixed(2); // Display time to 2 decimal places
+                    timeElapsed = (Date.now() - startTime) / 1000;
+                    timerDisplay.textContent = timeElapsed.toFixed(2);
                 }
             }
 
@@ -166,41 +180,36 @@
                 const typedText = inputBox.value.toLowerCase();
 
                 if (alphabet.startsWith(typedText)) {
-                    if (!typingStarted) {
-                        typingStarted = true;
-                    }
+                    if (!typingStarted) typingStarted = true;
                     statusDisplay.textContent = `Keep going...`;
                 } else {
                     statusDisplay.textContent = `Error! Check your input.`;
                 }
 
-                // If the entire alphabet is typed correctly
                 if (typedText === alphabet) {
                     clearInterval(timerInterval);
-                    statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds. Press the button to restart.`;
+                    statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds.`;
                     inputBox.disabled = true;
                     startButton.disabled = false;
+                    saveScore(timeElapsed);
                 }
             }
 
-            function checkEnterKey(event) {
-                if (event.key === "Enter" && inputBox.value.toLowerCase() === alphabet) {
-                    clearInterval(timerInterval);
-                    statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds. Press the button to restart.`;
-                    inputBox.disabled = true;
-                    startButton.disabled = false;
-                }
+            function saveScore(time) {
+                const scores = JSON.parse(localStorage.getItem("highScores")) || [];
+                scores.push(time);
+                scores.sort((a, b) => a - b);
+                if (scores.length > 5) scores.pop();
+                localStorage.setItem("highScores", JSON.stringify(scores));
+                displayScores();
             }
 
-            function resetTest() {
-                inputBox.value = "";
-                inputBox.disabled = true;
-                typingStarted = false;
-                startButton.disabled = false;
-                statusDisplay.textContent = "Test restarted. Click start to try again.";
-                clearInterval(timerInterval);
-                timerDisplay.textContent = "0.00";
+            function displayScores() {
+                const scores = JSON.parse(localStorage.getItem("highScores")) || [];
+                scoreList.innerHTML = scores.map(score => `<li>${score.toFixed(2)} seconds</li>`).join("");
             }
+
+            displayScores();
         </script>
     </body>
 </html>
