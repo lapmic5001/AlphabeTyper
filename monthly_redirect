@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Typing Challenge</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #ffb6c1;
+            color: white;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+        }
+        header {
+            width: 100%;
+            background-color: #333;
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        header:hover {
+            opacity: 1;
+        }
+        header a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            font-size: 18px;
+            margin: 0 15px;
+        }
+        header a:hover {
+            background-color: #444;
+            border-radius: 4px;
+        }
+        .word {
+            position: absolute;
+            font-size: 24px;
+            color: white;
+            background: rgba(255, 20, 147, 0.8);
+            padding: 10px 15px;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.8);
+            animation: float 3s ease-in-out infinite;
+            user-select: none;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        #mainMenu, #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 105, 180, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.8);
+        }
+        #gameOver {
+            display: none;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: #ff1493;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.8);
+        }
+        #score, #lives {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(255, 20, 147, 0.8);
+            padding: 10px 15px;
+            border-radius: 10px;
+        }
+        #lives {
+            left: auto;
+            right: 10px;
+        }
+        .heart {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: red;
+            transform: rotate(-45deg);
+            animation: hearts 5s linear infinite;
+        }
+        @keyframes hearts {
+            0% { transform: translateY(100vh) translateX(-50px) scale(1); opacity: 1; }
+            100% { transform: translateY(0) translateX(50px) scale(0.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="alphabetyper.html">Home</a>
+        <a href="daily_redirect.html">Daily Challenge</a>
+        <a href="this-page-here-yes-this-one.html">Monthly Game</a>
+    </header>
+
+    <div id="mainMenu">
+        <h1>💕 Valentine's Typing Challenge 💕</h1>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <div id="gameOver">
+        <h1>💔 Game Over! 💔</h1>
+        <p id="finalScore"></p>
+        <button onclick="startGame()">Play Again</button>
+    </div>
+
+    <div id="score">Words Typed: 0</div>
+    <div id="lives">💝💝💝</div>
+
+    <script>
+        const words = ["love", "heart", "cupid", "kiss", "hug", "chocolate", "rose", "sweet", "darling", "valentine", "crush", "romance"];
+        let score = 0;
+        let gameActive = false;
+        let lives = 3;
+
+        function startGame() {
+            score = 0;
+            lives = 3;
+            gameActive = true;
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('score').textContent = `Words Typed: ${score}`;
+            document.getElementById('lives').textContent = '💝💝💝';
+            clearWords();
+            spawnWord();
+            spawnHearts();
+        }
+
+        function spawnWord() {
+            if (!gameActive) return;
+
+            const word = document.createElement('div');
+            word.className = 'word';
+            word.textContent = words[Math.floor(Math.random() * words.length)];
+
+            const maxX = window.innerWidth - 100;
+            const maxY = window.innerHeight - 50;
+            word.style.left = `${Math.random() * maxX}px`;
+            word.style.top = `${Math.random() * maxY}px`;
+
+            document.body.appendChild(word);
+
+            const timer = setTimeout(() => {
+                if (document.body.contains(word)) {
+                    loseLife(word);
+                }
+            }, 3000);
+
+            word.dataset.timer = timer;
+        }
+
+        function spawnHearts() {
+            setInterval(() => {
+                if (!gameActive) return;
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.style.left = `${Math.random() * 100}vw`;
+                heart.style.top = '100vh';
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 5000);
+            }, 300);
+        }
+
+        window.addEventListener('keydown', function(event) {
+            if (!gameActive) return;
+
+            const wordsOnScreen = document.querySelectorAll('.word');
+            wordsOnScreen.forEach(wordEl => {
+                if (wordEl.textContent.startsWith(event.key)) {
+                    wordEl.textContent = wordEl.textContent.slice(1);
+
+                    if (wordEl.textContent === '') {
+                        clearTimeout(wordEl.dataset.timer);
+                        document.body.removeChild(wordEl);
+                        score++;
+                        document.getElementById('score').textContent = `Words Typed: ${score}`;
+                        spawnWord();
+                    }
+                }
+            });
+        });
+
+        function loseLife(wordElement) {
+            if (wordElement) {
+                clearTimeout(wordElement.dataset.timer);
+                wordElement.remove();
+            }
+            lives--;
+            document.getElementById('lives').textContent = '💝'.repeat(lives);
+            if (lives <= 0) endGame();
+            else spawnWord();
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearWords();
+            document.getElementById('finalScore').textContent = `Final Score: ${score}`;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+
+        function clearWords() {
+            document.querySelectorAll('.word').forEach(word => {
+                clearTimeout(word.dataset.timer);
+                word.remove();
+            });
+        }
+
+        window.onload = () => {
+            document.getElementById('mainMenu').style.display = 'block';
+        };
+    </script>
+</body>
+</html>
