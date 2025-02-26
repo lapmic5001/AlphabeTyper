@@ -123,10 +123,10 @@
     </head>
     <body>
         <header>
-        <a href="alphabetyper.html">Home</a>
-        <a href="daily_redirect.html">Daily Challenge</a>
-        <a href="monthly_redirect.html">Monthly Game</a>
-    </header>
+            <a href="alphabetyper.html">Home</a>
+            <a href="daily_redirect.html">Daily Challenge</a>
+            <a href="monthly_redirect.html">Monthly Game</a>
+        </header>
 
         <div class="container main-content">
             <h1>AlphabeTyper</h1>
@@ -145,7 +145,10 @@
 
         <script>
             const alphabet = "abcdefghijklmnopqrstuvwxyz";
-            let startTime, timerInterval, timeElapsed = 0, typingStarted = false;
+            let startTime,
+                timerInterval,
+                timeElapsed = 0,
+                typingStarted = false;
 
             const inputBox = document.getElementById("inputBox");
             const timerDisplay = document.getElementById("timer");
@@ -166,22 +169,26 @@
                 statusDisplay.textContent = "";
                 timeElapsed = 0;
                 typingStarted = false;
-                startTime = Date.now();
-                timerInterval = setInterval(updateTimer, 10);
+                timerDisplay.textContent = "0.00";
+                // Notice: We are NOT starting the timer here.
             }
 
             function updateTimer() {
-                if (typingStarted) {
-                    timeElapsed = (Date.now() - startTime) / 1000;
-                    timerDisplay.textContent = timeElapsed.toFixed(2);
-                }
+                timeElapsed = (Date.now() - startTime) / 1000;
+                timerDisplay.textContent = timeElapsed.toFixed(2);
             }
 
             function trackInput() {
                 const typedText = inputBox.value.toLowerCase();
 
+                // Start the timer on the first keystroke.
+                if (!typingStarted && typedText.length > 0) {
+                    typingStarted = true;
+                    startTime = Date.now();
+                    timerInterval = setInterval(updateTimer, 10);
+                }
+
                 if (alphabet.startsWith(typedText)) {
-                    if (!typingStarted) typingStarted = true;
                     statusDisplay.textContent = `Keep going...`;
                 } else {
                     statusDisplay.textContent = `Error! Check your input.`;
@@ -207,7 +214,7 @@
 
             function displayScores() {
                 const scores = JSON.parse(localStorage.getItem("highScores")) || [];
-                scoreList.innerHTML = scores.map(score => `<li>${score.toFixed(2)} seconds</li>`).join("");
+                scoreList.innerHTML = scores.map((score) => `<li>${score.toFixed(2)} seconds</li>`).join("");
             }
 
             displayScores();
