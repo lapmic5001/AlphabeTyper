@@ -1,227 +1,322 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link type="image/x-icon" href="A-Z-favicon.png" rel="icon" />
-        <title>AlphabeTyper</title>
-        <style>
-            * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-            }
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #fff;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                text-align: center;
-                color: #333;
-            }
-            .container {
-                background-color: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                width: 350px;
-            }
-            h1 {
-                font-size: 28px;
-                margin-bottom: 10px;
-                color: #333;
-            }
-            #alphabetDisplay {
-                font-size: 22px;
-                font-weight: bold;
-                margin-bottom: 20px;
-                color: #007bff;
-                overflow-wrap: break-word;
-                white-space: normal;
-            }
-            #inputBox {
-                padding: 10px;
-                font-size: 18px;
-                width: 100%;
-                margin-bottom: 20px;
-                border: 2px solid #007bff;
-                border-radius: 4px;
-            }
-            #status {
-                font-size: 16px;
-                color: #555;
-            }
-            button {
-                padding: 10px 20px;
-                font-size: 18px;
-                cursor: pointer;
-                border: none;
-                background-color: #28a745;
-                color: white;
-                border-radius: 4px;
-                margin-top: 10px;
-                transition: background-color 0.3s;
-            }
-            button:disabled {
-                background-color: #d6d6d6;
-            }
-            button:hover:not(:disabled) {
-                background-color: #218838;
-            }
-            header {
-                width: 100%;
-                background-color: #333;
-                padding: 10px 0;
-                position: fixed;
-                top: 0;
-                left: 0;
-                z-index: 100;
-            }
-            header a {
-                color: white;
-                text-decoration: none;
-                padding: 15px;
-                font-size: 18px;
-                margin: 0 15px;
-            }
-            header a:hover {
-                background-color: #444;
-                border-radius: 4px;
-            }
-            .main-content {
-                margin-top: 60px;
-            }
-            #highScores {
-                margin-top: 20px;
-                text-align: left;
-            }
-            #highScores h2 {
-                font-size: 20px;
-                color: #333;
-            }
-            #highScores ol {
-                padding-left: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <header>
-            <a href="alphabetyper.html">Home</a>
-            <a href="daily_redirect.html">Daily Challenge</a>
-            <a href="monthly_redirect.html">Monthly Game</a>
-        </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link type="image/x-icon" href="A-Z-favicon.png" rel="icon" />
+    <title>AlphabeTyper</title>
+    <style>
+      /* Base Reset & Styles */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #fff;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+      header {
+        width: 100%;
+        background-color: #333;
+        padding: 10px 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        text-align: center;
+      }
+      header a {
+        color: white;
+        text-decoration: none;
+        padding: 15px;
+        font-size: 18px;
+        margin: 0 15px;
+      }
+      header a:hover {
+        background-color: #444;
+        border-radius: 4px;
+      }
+      .container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 350px;
+        text-align: center;
+      }
+      h1 {
+        font-size: 28px;
+        margin-bottom: 10px;
+        /* No mode text here—always just "AlphabeTyper" */
+      }
+      #alphabetDisplay {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #007bff;
+        word-wrap: break-word;
+      }
+      #inputBox {
+        padding: 10px;
+        font-size: 18px;
+        width: 100%;
+        margin-bottom: 20px;
+        border: 2px solid #007bff;
+        border-radius: 4px;
+      }
+      #status {
+        font-size: 16px;
+        color: #555;
+        min-height: 20px;
+      }
+      #timer {
+        font-weight: bold;
+      }
+      #startButton {
+        padding: 10px 20px;
+        font-size: 18px;
+        cursor: pointer;
+        border: none;
+        background-color: #28a745;
+        color: white;
+        border-radius: 4px;
+        margin-top: 10px;
+        transition: background-color 0.3s;
+      }
+      #startButton:disabled {
+        background-color: #d6d6d6;
+      }
+      #startButton:hover:not(:disabled) {
+        background-color: #218838;
+      }
+      .highScores {
+        margin-top: 20px;
+        text-align: left;
+      }
+      .highScores h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+      #scoreList {
+        padding-left: 20px;
+      }
+      /* Inverted Mode Styles: when body has the "inverted" class, the whole page is dark */
+      body.inverted {
+        background-color: #121212;
+        color: #fff;
+      }
+      body.inverted .container {
+        background-color: #1e1e1e;
+        box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+      }
+      body.inverted h1,
+      body.inverted #status,
+      body.inverted #alphabetDisplay,
+      body.inverted .highScores h2,
+      body.inverted #scoreList li {
+        color: #fff;
+      }
+      body.inverted #inputBox {
+        background-color: #333;
+        color: #fff;
+        border-color: #555;
+      }
+      body.inverted #startButton {
+        background-color: #6c757d;
+      }
+      /* Mode Switch: a badly hidden toggle in the bottom left */
+      #modeSwitch {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        display: flex;
+        flex-direction: column;
+        opacity: 0.3;
+        transition: opacity 0.3s;
+        z-index: 200;
+      }
+      #modeSwitch:hover {
+        opacity: 1;
+      }
+      .modeButton {
+        background: #28a745;
+        border: none;
+        color: white;
+        padding: 5px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        margin: 2px 0;
+      }
+      /* The top (normal) button is above the bottom (inverted) button */
+      .modeButton.active {
+        background: #218838;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="alphabetyper.html">Home</a>
+      <a href="daily_redirect.html">Daily Challenge</a>
+      <a href="monthly_redirect.html">Monthly Game</a>
+    </header>
 
-        <div class="container main-content">
-            <h1>AlphabeTyper</h1>
-            <p>Type the following letters as quickly as possible:</p>
-            <div id="alphabetDisplay">abcdefghijklmnopqrstuvwxyz</div>
-            <input type="text" id="inputBox" placeholder="Start typing here..." autofocus />
-            <p id="status"></p>
-            <p>Time: <span id="timer">0.00</span> seconds</p>
-            <button id="startButton">Start Challenge</button>
+    <div class="container">
+      <h1>AlphabeTyper</h1>
+      <p>Type the following letters as quickly as possible:</p>
+      <div id="alphabetDisplay"></div>
+      <input type="text" id="inputBox" placeholder="Start typing here..." autofocus />
+      <p id="status"></p>
+      <p>Time: <span id="timer">0.00</span> seconds</p>
+      <button id="startButton">Start Challenge</button>
+      <div class="highScores">
+        <h2>Top Scores:</h2>
+        <ol id="scoreList"></ol>
+      </div>
+    </div>
 
-            <div id="highScores">
-                <h2>Top Scores:</h2>
-                <ol id="scoreList"></ol>
-            </div>
-        </div>
+    <!-- Hidden Mode Switch (positioned bottom left) -->
+    <div id="modeSwitch">
+      <!-- Normal mode is on top -->
+      <button id="normalModeButton" class="modeButton active">Normal</button>
+      <!-- Inverted mode is on the bottom -->
+      <button id="invertedModeButton" class="modeButton">Inverted</button>
+    </div>
 
-        <script>
-            const alphabet = "abcdefghijklmnopqrstuvwxyz";
-            const clearCode = "=+-clear_data-+=";
-            let startTime,
-                timerInterval,
-                timeElapsed = 0,
-                typingStarted = false;
+    <script>
+      const alphabet = "abcdefghijklmnopqrstuvwxyz";
+      const invertedAlphabet = alphabet.split("").reverse().join("");
+      const clearCode = "=+-clear_data-+=";
+      let isInverted = false;
+      let startTime, timerInterval, timeElapsed = 0, typingStarted = false;
 
-            const inputBox = document.getElementById("inputBox");
-            const timerDisplay = document.getElementById("timer");
-            const statusDisplay = document.getElementById("status");
-            const startButton = document.getElementById("startButton");
-            const scoreList = document.getElementById("scoreList");
+      // DOM element references
+      const alphabetDisplay = document.getElementById("alphabetDisplay");
+      const inputBox = document.getElementById("inputBox");
+      const statusDisplay = document.getElementById("status");
+      const timerDisplay = document.getElementById("timer");
+      const startButton = document.getElementById("startButton");
+      const scoreList = document.getElementById("scoreList");
+      const normalModeButton = document.getElementById("normalModeButton");
+      const invertedModeButton = document.getElementById("invertedModeButton");
 
-            inputBox.disabled = true;
+      // Set initial state
+      updateAlphabetDisplay();
+      displayScores();
+      inputBox.disabled = true;
 
-            startButton.addEventListener("click", startTest);
-            inputBox.addEventListener("input", trackInput);
+      startButton.addEventListener("click", startTest);
+      inputBox.addEventListener("input", trackInput);
+      normalModeButton.addEventListener("click", () => { toggleMode(false); });
+      invertedModeButton.addEventListener("click", () => { toggleMode(true); });
 
-            function startTest() {
-                startButton.disabled = true;
-                inputBox.disabled = false;
-                inputBox.value = "";
-                inputBox.focus();
-                statusDisplay.textContent = "";
-                timeElapsed = 0;
-                typingStarted = false;
-                timerDisplay.textContent = "0.00";
-                // Notice: We are NOT starting the timer here.
-            }
+      function startTest() {
+        startButton.disabled = true;
+        inputBox.disabled = false;
+        inputBox.value = "";
+        inputBox.focus();
+        statusDisplay.textContent = "";
+        timeElapsed = 0;
+        typingStarted = false;
+        timerDisplay.textContent = "0.00";
+        clearInterval(timerInterval);
+      }
 
-            function updateTimer() {
-                timeElapsed = (Date.now() - startTime) / 1000;
-                timerDisplay.textContent = timeElapsed.toFixed(2);
-            }
+      function updateTimer() {
+        timeElapsed = (Date.now() - startTime) / 1000;
+        timerDisplay.textContent = timeElapsed.toFixed(2);
+      }
 
-            function trackInput() {
-                // Get the typed text in lowercase.
-                const typedText = inputBox.value.toLowerCase();
+      function trackInput() {
+        const typedText = inputBox.value.toLowerCase();
+        const expectedAlphabet = isInverted ? invertedAlphabet : alphabet;
 
-                // Check for clear data command.
-                if (clearCode.startsWith(typedText)) {
-                    const remaining = clearCode.length - typedText.length;
-                    statusDisplay.textContent = `Clearing Data in ${remaining} Keystrokes.`;
-                    if (typedText === clearCode) {
-                        localStorage.removeItem("highScores");
-                        displayScores();
-                        statusDisplay.textContent = "Data cleared!";
-                        inputBox.value = "";
-                    }
-                    return; // Skip the normal alphabet test logic.
-                }
-
-                // Start the timer on the first keystroke.
-                if (!typingStarted && typedText.length > 0) {
-                    typingStarted = true;
-                    startTime = Date.now();
-                    timerInterval = setInterval(updateTimer, 10);
-                }
-
-                // Normal alphabet test validation.
-                if (alphabet.startsWith(typedText)) {
-                    statusDisplay.textContent = "Keep going...";
-                } else {
-                    statusDisplay.textContent = "Error! Check your input.";
-                }
-
-                // Test completion.
-                if (typedText === alphabet) {
-                    clearInterval(timerInterval);
-                    statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds.`;
-                    inputBox.disabled = true;
-                    startButton.disabled = false;
-                    saveScore(timeElapsed);
-                }
-            }
-
-            function saveScore(time) {
-                const scores = JSON.parse(localStorage.getItem("highScores")) || [];
-                scores.push(time);
-                scores.sort((a, b) => a - b);
-                if (scores.length > 5) scores.pop();
-                localStorage.setItem("highScores", JSON.stringify(scores));
-                displayScores();
-            }
-
-            function displayScores() {
-                const scores = JSON.parse(localStorage.getItem("highScores")) || [];
-                scoreList.innerHTML = scores
-                    .map((score) => `<li>${score.toFixed(2)} seconds</li>`)
-                    .join("");
-            }
-
+        // Clear-data command
+        if (clearCode.startsWith(typedText)) {
+          const remaining = clearCode.length - typedText.length;
+          statusDisplay.textContent = `Clearing Data in ${remaining} Keystrokes.`;
+          if (typedText === clearCode) {
+            const key = isInverted ? "highScoresInverted" : "highScores";
+            localStorage.removeItem(key);
             displayScores();
-        </script>
-    </body>
+            statusDisplay.textContent = "Data cleared!";
+            inputBox.value = "";
+          }
+          return;
+        }
+
+        if (!typingStarted && typedText.length > 0) {
+          typingStarted = true;
+          startTime = Date.now();
+          timerInterval = setInterval(updateTimer, 10);
+        }
+
+        if (expectedAlphabet.startsWith(typedText)) {
+          statusDisplay.textContent = "Keep going...";
+        } else {
+          statusDisplay.textContent = "Error! Check your input.";
+        }
+
+        if (typedText === expectedAlphabet) {
+          clearInterval(timerInterval);
+          statusDisplay.textContent = `Test complete! Time: ${timeElapsed.toFixed(2)} seconds.`;
+          inputBox.disabled = true;
+          startButton.disabled = false;
+          saveScore(timeElapsed);
+        }
+      }
+
+      function saveScore(time) {
+        const key = isInverted ? "highScoresInverted" : "highScores";
+        const scores = JSON.parse(localStorage.getItem(key)) || [];
+        scores.push(time);
+        scores.sort((a, b) => a - b);
+        if (scores.length > 5) scores.pop();
+        localStorage.setItem(key, JSON.stringify(scores));
+        displayScores();
+      }
+
+      function displayScores() {
+        const key = isInverted ? "highScoresInverted" : "highScores";
+        const scores = JSON.parse(localStorage.getItem(key)) || [];
+        scoreList.innerHTML = scores
+          .map((score) => `<li>${score.toFixed(2)} seconds</li>`)
+          .join("");
+      }
+
+      function updateAlphabetDisplay() {
+        alphabetDisplay.textContent = isInverted ? invertedAlphabet : alphabet;
+      }
+
+      function toggleMode(invert) {
+        if (isInverted === invert) return; // No change needed.
+        isInverted = invert;
+        document.body.className = isInverted ? "inverted" : "";
+        updateAlphabetDisplay();
+        displayScores();
+        // Reset the challenge on mode change.
+        inputBox.value = "";
+        inputBox.disabled = true;
+        startButton.disabled = false;
+        statusDisplay.textContent = "";
+        timerDisplay.textContent = "0.00";
+        clearInterval(timerInterval);
+        // Update mode switch buttons' active state.
+        if (isInverted) {
+          invertedModeButton.classList.add("active");
+          normalModeButton.classList.remove("active");
+        } else {
+          normalModeButton.classList.add("active");
+          invertedModeButton.classList.remove("active");
+        }
+      }
+    </script>
+  </body>
 </html>
