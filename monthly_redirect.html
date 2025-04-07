@@ -4,19 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link type="image/x-icon" href="A-Z-favicon.png" rel="icon" />
-  <title>March Typing Challenge</title>
+  <title>April Typing Challenge</title>
   <style>
     body {
       margin: 0;
       overflow: hidden;
-      background-color: #32cd32; /* LimeGreen background */
+      background-color: #add8e6; /* LightBlue background for April */
       color: white;
       font-family: 'Comic Sans MS', cursive, sans-serif;
       text-align: center;
     }
     header {
       width: 100%;
-      background-color: #006400; /* DarkGreen header */
+      background-color: #9370DB; /* MediumPurple header for spring vibe */
       padding: 10px 0;
       position: fixed;
       top: 0;
@@ -36,17 +36,17 @@
       margin: 0 15px;
     }
     header a:hover {
-      background-color: #228B22;
+      background-color: #ba55d3;
       border-radius: 4px;
     }
     .word {
       position: absolute;
       font-size: 24px;
       color: white;
-      background: rgba(0, 128, 0, 0.8);
+      background: rgba(255, 192, 203, 0.8); /* LightPink background for words */
       padding: 10px 15px;
       border-radius: 20px;
-      box-shadow: 0 0 10px rgba(0, 100, 0, 0.8);
+      box-shadow: 0 0 10px rgba(255, 105, 180, 0.8);
       animation: float 3s ease-in-out infinite;
       user-select: none;
     }
@@ -61,10 +61,10 @@
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
-      background: rgba(34, 139, 34, 0.9);
+      background: rgba(147, 112, 219, 0.9); /* Matching header color */
       padding: 30px;
       border-radius: 20px;
-      box-shadow: 0 0 20px rgba(0, 100, 0, 0.8);
+      box-shadow: 0 0 20px rgba(123, 104, 238, 0.8);
     }
     #gameOver {
       display: none;
@@ -72,19 +72,19 @@
     button {
       padding: 15px 30px;
       font-size: 20px;
-      background: #228B22;
+      background: #ba55d3;
       color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 0 10px rgba(0, 100, 0, 0.8);
+      box-shadow: 0 0 10px rgba(123, 104, 238, 0.8);
     }
     #score, #lives {
       position: fixed;
       top: 10px;
       font-size: 24px;
       font-weight: bold;
-      background: rgba(0, 128, 0, 0.8);
+      background: rgba(147, 112, 219, 0.8);
       padding: 10px 15px;
       border-radius: 10px;
     }
@@ -94,8 +94,8 @@
     #lives {
       right: 10px;
     }
-    /* Shamrock animation styles */
-    .shamrock {
+    /* Floating blossom animation styles */
+    .shamrock {  /* Renamed class remains for simplicity */
       position: fixed;
       font-size: 24px;
       animation: shamrocks 5s linear infinite;
@@ -114,29 +114,37 @@
   </header>
 
   <div id="mainMenu">
-    <h1>🍀 March Typing Challenge 🍀</h1>
+    <h1>🌸 April Typing Challenge 🌸</h1>
     <button onclick="startGame()">Start Game</button>
   </div>
 
   <div id="gameOver">
-    <h1>🍀 Game Over! 🍀</h1>
+    <h1>🌸 Game Over! 🌸</h1>
     <p id="finalScore"></p>
     <button onclick="startGame()">Play Again</button>
   </div>
 
   <div id="score">Words Typed: 0</div>
-  <div id="lives">🍀🍀🍀</div>
+  <div id="lives">🌸🌸🌸</div>
 
   <script>
-    // 50 March-themed words
+    // Theme ideas for later:
+    // - February: Valentine's (e.g., hearts, romance, red, cupid)
+    // - March: St. Patrick's (e.g., shamrocks, Irish luck, green)
+    // - April: Spring/Easter (e.g., blossoms, rain, pastel colors)
+    // - May: May Flowers / Spring Renewal, etc.
+    // Add more themes as needed.
+
+    // 50 April-themed words
     const words = [
-      "march", "shamrock", "lucky", "irish", "leprechaun", "clover",
-      "gold", "green", "parade", "festival", "rainbow", "celtic", "pub",
-      "dublin", "spring", "vernal", "bloom", "thaw", "equinoctial", "emerald",
-      "party", "joy", "dance", "music", "feast", "tradition", "folklore", "history",
-      "myth", "legend", "fortune", "luck", "fiddle", "jig", "tune",
-      "toast", "cheer", "festivity", "celebrate", "greenery", "blarney", "story",
-      "miracle", "whimsy", "charm", "luckiness"
+      "april", "shower", "rain", "flowers", "blossom", "bunny",
+      "easter", "spring", "pastel", "rebirth", "green", "lamb",
+      "bud", "sprout", "fresh", "daisy", "tulip", "cherry", "bloom",
+      "sunshine", "warmth", "renewal", "flutter", "picnic", "garden",
+      "rainbow", "drizzle", "sprinkle", "verdant", "moss", "growth",
+      "breeze", "petal", "verdure", "lively", "chirp", "sing", "play",
+      "joy", "dance", "light", "hope", "smile", "delight", "aroma",
+      "spritz", "vivid", "color", "renew", "festive"
     ];
     let score = 0;
     let gameActive = false;
@@ -149,7 +157,7 @@
       document.getElementById('mainMenu').style.display = 'none';
       document.getElementById('gameOver').style.display = 'none';
       document.getElementById('score').textContent = `Words Typed: ${score}`;
-      document.getElementById('lives').textContent = '🍀'.repeat(lives);
+      document.getElementById('lives').textContent = '🌸'.repeat(lives);
       clearWords();
       spawnWord();
       spawnShamrocks();
@@ -179,15 +187,16 @@
     }
 
     function spawnShamrocks() {
+      // Floating blossoms for April theme
       setInterval(() => {
         if (!gameActive) return;
-        const shamrock = document.createElement('div');
-        shamrock.className = 'shamrock';
-        shamrock.textContent = "🍀";
-        shamrock.style.left = `${Math.random() * 100}vw`;
-        shamrock.style.top = '100vh';
-        document.body.appendChild(shamrock);
-        setTimeout(() => shamrock.remove(), 5000);
+        const blossom = document.createElement('div');
+        blossom.className = 'shamrock';
+        blossom.textContent = "🌸";
+        blossom.style.left = `${Math.random() * 100}vw`;
+        blossom.style.top = '100vh';
+        document.body.appendChild(blossom);
+        setTimeout(() => blossom.remove(), 5000);
       }, 300);
     }
 
@@ -216,7 +225,7 @@
         wordElement.remove();
       }
       lives--;
-      document.getElementById('lives').textContent = '🍀'.repeat(lives);
+      document.getElementById('lives').textContent = '🌸'.repeat(lives);
       if (lives <= 0) endGame();
       else spawnWord();
     }
