@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Long Words Typing Challenge</title>
+    <style>
+      /* ─── Base Styles ────────────────────────────────────────────────────── */
+      body {
+        margin: 0;
+        overflow: hidden;
+        color: white;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        text-align: center;
+        background-color: #000;
+      }
+      header {
+        width: 100%;
+        padding: 10px 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+      header:hover { opacity: 1; }
+      header a { color: inherit; text-decoration: none; padding: 15px; font-size: 18px; margin: 0 15px; }
+      header a:hover { background-color: rgba(255,255,255,0.2); border-radius: 4px; }
+
+      /* ─── Score & Lives ─────────────────────────────────────────────────── */
+      #score, #lives {
+        position: fixed; top: 10px; font-size: 24px; font-weight: bold;
+        padding: 10px 15px; border-radius: 10px; border: 2px solid currentColor;
+      }
+      #score { left: 10px; }
+      #lives { right: 10px; }
+
+      /* ─── Word ──────────────────────────────────────────────────────────── */
+      .word {
+        position: absolute;
+        left: 50%; /* center horizontally */
+        transform: translateX(-50%);
+        font-size: 24px;
+        color: inherit;
+        background: rgba(0,0,0,0.5);
+        padding: 10px 15px;
+        border-radius: 20px;
+        box-shadow: 0 0 10px currentColor;
+        user-select: none;
+        border: 2px solid currentColor;
+        animation: float 3s ease-in-out infinite;
+      }
+      @keyframes float {
+        0% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-10px); }
+        100% { transform: translateX(-50%) translateY(0); }
+      }
+
+      /* ─── Menu ──────────────────────────────────────────────────────────── */
+      #mainMenu, #gameOver {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        text-align: center; padding: 30px; border-radius: 20px;
+        box-shadow: 0 0 20px currentColor; background: rgba(40,40,40,0.8);
+      }
+      #gameOver { display: none; }
+      button {
+        padding: 15px 30px; font-size: 20px; color: inherit;
+        border: 2px solid currentColor; border-radius: 10px; cursor: pointer;
+        box-shadow: 0 0 10px currentColor;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="../alphabetyper.html">Home</a>
+      <a href="../daily_redirect.html">Daily Challenge</a>
+      <a href="../monthly_redirect.html">Monthly Game</a>
+    </header>
+
+    <div id="score">Words Typed: 0</div>
+    <div id="lives">❤️❤️❤️</div>
+
+    <div id="mainMenu">
+      <h1>Long Words Typing Challenge</h1>
+      <button onclick="startGame()">Start Game</button>
+      <p style="font-size:14px; opacity:0.8; margin-top:20px;">
+        Type the word before 10 seconds runs out or you lose a life!
+      </p>
+    </div>
+
+    <div id="gameOver">
+      <h1>Game Over!</h1>
+      <p id="finalScore"></p>
+      <button onclick="startGame()">Play Again</button>
+    </div>
+
+    <script>
+      // ─── List of long/hard words ─────────────────────────────────────────
+      const longWords = [
+        "pneumonoultramicroscopicsilicovolcanoconiosis",
+        "hippopotomonstrosesquippedaliophobia",
+        "floccinaucinihilipilification",
+        "antidisestablishmentarianism",
+        "honorificabilitudinitatibus",
+        "thyroparathyroidectomized",
+        "dichlorodiphenyltrichloroethane",
+        "incomprehensibilities",
+        "psychoneuroendocrinological",
+        "radioimmunoelectrophoresis",
+        "spectrophotofluorometrically",
+        "subdermatoglyphic",
+        "uncharacteristically",
+        "electroencephalographically",
+        "psychophysicotherapeutics",
+        "psychoneuroimmunology",
+        "otorhinolaryngological",
+        "xenotransplantation",
+        "microarchitecture",
+        "thyrocalcitonin"
+        // …add up to ~500 words…
+      ];
+
+      let words = [...longWords];
+      let score = 0, lives = 3, gameActive = false;
+      let currentWordEl = null;
+      let wordTimer = null;
+
+      function updateScoreAndLives() {
+        document.getElementById("score").textContent = `Words Typed: ${score}`;
+        document.getElementById("lives").textContent = "❤️".repeat(lives);
+      }
+
+      function startGame() {
+        score = 0;
+        lives = 3;
+        gameActive = true;
+        document.getElementById("mainMenu").style.display = "none";
+        document.getElementById("gameOver").style.display = "none";
+        updateScoreAndLives();
+        nextWord();
+      }
+
+      function nextWord() {
+        clearCurrent();
+        if (!gameActive) return;
+        // spawn one word
+        currentWordEl = document.createElement("div");
+        currentWordEl.className = "word";
+        currentWordEl.textContent = words[Math.floor(Math.random() * words.length)];
+        currentWordEl.style.top = `${Math.random() * (window.innerHeight - 50)}px`;
+        document.body.appendChild(currentWordEl);
+        // start 10s timer
+        wordTimer = setTimeout(() => {
+          loseLife();
+        }, 10000);
+      }
+
+      window.addEventListener("keydown", e => {
+        if (!gameActive || !currentWordEl) return;
+        if (currentWordEl.textContent.startsWith(e.key)) {
+          currentWordEl.textContent = currentWordEl.textContent.slice(1);
+          if (!currentWordEl.textContent) {
+            // word complete
+            clearTimeout(wordTimer);
+            score++;
+            updateScoreAndLives();
+            nextWord();
+          }
+        }
+      });
+
+      function loseLife() {
+        if (currentWordEl) {
+          currentWordEl.remove();
+          currentWordEl = null;
+        }
+        lives--;
+        updateScoreAndLives();
+        if (lives <= 0) {
+          endGame();
+        } else {
+          nextWord();
+        }
+      }
+
+      function clearCurrent() {
+        if (wordTimer) clearTimeout(wordTimer);
+        if (currentWordEl) currentWordEl.remove();
+        currentWordEl = null;
+      }
+
+      function endGame() {
+        gameActive = false;
+        clearCurrent();
+        document.getElementById("finalScore").textContent = `Final Score: ${score}`;
+        document.getElementById("gameOver").style.display = "block";
+      }
+
+      window.onload = () => {
+        document.getElementById("mainMenu").style.display = "block";
+      };
+    </script>
+  </body>
+</html>
