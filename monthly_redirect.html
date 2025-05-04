@@ -1,252 +1,950 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link type="image/x-icon" href="A-Z-favicon.png" rel="icon" />
-  <title>April Typing Challenge</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background-color: #add8e6; /* LightBlue background for April */
-      color: white;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      text-align: center;
-    }
-    header {
-      width: 100%;
-      background-color: #9370DB; /* MediumPurple header for spring vibe */
-      padding: 10px 0;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 100;
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
-    }
-    header:hover {
-      opacity: 1;
-    }
-    header a {
-      color: white;
-      text-decoration: none;
-      padding: 15px;
-      font-size: 18px;
-      margin: 0 15px;
-    }
-    header a:hover {
-      background-color: #ba55d3;
-      border-radius: 4px;
-    }
-    .word {
-      position: absolute;
-      font-size: 24px;
-      color: white;
-      background: rgba(255, 192, 203, 0.8); /* LightPink background for words */
-      padding: 10px 15px;
-      border-radius: 20px;
-      box-shadow: 0 0 10px rgba(255, 105, 180, 0.8);
-      animation: float 3s ease-in-out infinite;
-      user-select: none;
-    }
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-      100% { transform: translateY(0px); }
-    }
-    #mainMenu, #gameOver {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      background: rgba(147, 112, 219, 0.9); /* Matching header color */
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(123, 104, 238, 0.8);
-    }
-    #gameOver {
-      display: none;
-    }
-    button {
-      padding: 15px 30px;
-      font-size: 20px;
-      background: #ba55d3;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(123, 104, 238, 0.8);
-    }
-    #score, #lives {
-      position: fixed;
-      top: 10px;
-      font-size: 24px;
-      font-weight: bold;
-      background: rgba(147, 112, 219, 0.8);
-      padding: 10px 15px;
-      border-radius: 10px;
-    }
-    #score {
-      left: 10px;
-    }
-    #lives {
-      right: 10px;
-    }
-    /* Floating blossom animation styles */
-    .shamrock {  /* Renamed class remains for simplicity */
-      position: fixed;
-      font-size: 24px;
-      animation: shamrocks 5s linear infinite;
-    }
-    @keyframes shamrocks {
-      0% { transform: translateY(100vh) translateX(-50px) scale(1); opacity: 1; }
-      100% { transform: translateY(0) translateX(50px) scale(0.5); opacity: 0; }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <a href="alphabetyper.html">Home</a>
-    <a href="daily_redirect.html">Daily Challenge</a>
-    <a href="monthly_redirect.html">Monthly Game</a>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link type="image/x-icon" href="A-Z-favicon.png" rel="icon" />
+    <title>Typing Challenge</title>
+    <style>
+      /* ─── Base Styles ────────────────────────────────────────────────────── */
+      body {
+        margin: 0;
+        overflow: hidden;
+        color: white;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        text-align: center;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+      }
+      header {
+        width: 100%;
+        padding: 10px 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+      header:hover {
+        opacity: 1;
+      }
+      header a {
+        color: inherit;
+        text-decoration: none;
+        padding: 15px;
+        font-size: 18px;
+        margin: 0 15px;
+      }
+      header a:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+      }
 
-  <div id="mainMenu">
-    <h1>🌸 April Typing Challenge 🌸</h1>
-    <button onclick="startGame()">Start Game</button>
-  </div>
+      /* ─── Score & Lives ─────────────────────────────────────────────────── */
+      #score,
+      #lives {
+        position: fixed;
+        top: 10px;
+        font-size: 24px;
+        font-weight: bold;
+        padding: 10px 15px;
+        border-radius: 10px;
+        border: 2px solid currentColor;
+      }
+      #score {
+        left: 10px;
+      }
+      #lives {
+        right: 10px;
+      }
 
-  <div id="gameOver">
-    <h1>🌸 Game Over! 🌸</h1>
-    <p id="finalScore"></p>
-    <button onclick="startGame()">Play Again</button>
-  </div>
-
-  <div id="score">Words Typed: 0</div>
-  <div id="lives">🌸🌸🌸</div>
-
-  <script>
-    // Theme ideas for later:
-    // - February: Valentine's (e.g., hearts, romance, red, cupid)
-    // - March: St. Patrick's (e.g., shamrocks, Irish luck, green)
-    // - April: Spring/Easter (e.g., blossoms, rain, pastel colors)
-    // - May: May Flowers / Spring Renewal, etc.
-    // Add more themes as needed.
-
-    // 50 April-themed words
-    const words = [
-      "april", "shower", "rain", "flowers", "blossom", "bunny",
-      "easter", "spring", "pastel", "rebirth", "green", "lamb",
-      "bud", "sprout", "fresh", "daisy", "tulip", "cherry", "bloom",
-      "sunshine", "warmth", "renewal", "flutter", "picnic", "garden",
-      "rainbow", "drizzle", "sprinkle", "verdant", "moss", "growth",
-      "breeze", "petal", "verdure", "lively", "chirp", "sing", "play",
-      "joy", "dance", "light", "hope", "smile", "delight", "aroma",
-      "spritz", "vivid", "color", "renew", "festive"
-    ];
-    let score = 0;
-    let gameActive = false;
-    let lives = 3;
-
-    function startGame() {
-      score = 0;
-      lives = 3;
-      gameActive = true;
-      document.getElementById('mainMenu').style.display = 'none';
-      document.getElementById('gameOver').style.display = 'none';
-      document.getElementById('score').textContent = `Words Typed: ${score}`;
-      document.getElementById('lives').textContent = '🌸'.repeat(lives);
-      clearWords();
-      spawnWord();
-      spawnShamrocks();
-    }
-
-    function spawnWord() {
-      if (!gameActive) return;
-
-      const word = document.createElement('div');
-      word.className = 'word';
-      word.textContent = words[Math.floor(Math.random() * words.length)];
-
-      const maxX = window.innerWidth - 100;
-      const maxY = window.innerHeight - 50;
-      word.style.left = `${Math.random() * maxX}px`;
-      word.style.top = `${Math.random() * maxY}px`;
-
-      document.body.appendChild(word);
-
-      const timer = setTimeout(() => {
-        if (document.body.contains(word)) {
-          loseLife(word);
+      /* ─── Words ──────────────────────────────────────────────────────────── */
+      .word {
+        position: absolute;
+        font-size: 24px;
+        color: inherit;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 10px 15px;
+        border-radius: 20px;
+        box-shadow: 0 0 10px currentColor;
+        animation: float 3s ease-in-out infinite;
+        user-select: none;
+        border: 2px solid currentColor;
+      }
+      @keyframes float {
+        0% {
+          transform: translateY(0);
         }
-      }, 3000);
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
 
-      word.dataset.timer = timer;
-    }
+      /* ─── Menu ──────────────────────────────────────────────────────────── */
+      #mainMenu,
+      #gameOver,
+      #practiceMenu {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 0 20px currentColor;
+        color: inherit;
+        transition: background 0.3s;
+      }
+      #gameOver,
+      #practiceMenu {
+        display: none;
+      }
+      button {
+        padding: 15px 30px;
+        font-size: 20px;
+        color: inherit;
+        border: 2px solid currentColor;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 0 10px currentColor;
+        transition: background 0.3s;
+      }
+      input[type="text"] {
+        padding: 10px;
+        font-size: 18px;
+        border: 2px solid currentColor;
+        border-radius: 8px;
+        margin: 8px 0;
+        width: 80%;
+        max-width: 300px;
+        color: inherit;
+        background: transparent;
+      }
+      /* ─── Floating emojis ───────────────────────────────────────────────── */
+      .shamrock {
+        position: fixed;
+        font-size: 24px;
+        animation: shamrocks 5s linear infinite;
+      }
+      @keyframes shamrocks {
+        0% {
+          transform: translateY(100vh) translateX(-50px) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(0) translateX(50px) scale(0.5);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="alphabetyper.html">Home</a>
+      <a href="daily_redirect.html">Daily</a>
+      <a href="monthly_redirect.html">Monthly</a>
+    </header>
 
-    function spawnShamrocks() {
-      // Floating blossoms for April theme
-      setInterval(() => {
+    <div id="score">Words Typed: 0</div>
+    <div id="lives">❤️❤️❤️</div>
+
+    <div id="mainMenu">
+      <h1>Typing Challenge</h1>
+      <button onclick="startGame()">Start Game</button>
+      <div style="margin-top: 20px; font-size: 14px; opacity: 0.8">
+        Type <strong>practice</strong> to drill words, or a secret word to jump:
+      </div>
+      <input
+        id="specialInput"
+        type="text"
+        placeholder="Enter command or secret"
+        onkeydown="if(event.key==='Enter') handleSpecial()" />
+    </div>
+
+    <div id="practiceMenu">
+      <h2>Practice Mode</h2>
+      <div id="practiceWord" style="font-size: 28px; margin: 20px"></div>
+      <input
+        id="practiceInput"
+        type="text"
+        placeholder="Type the word above"
+        onkeydown="if(event.key==='Enter') submitPractice()" />
+      <div style="margin-top: 10px">
+        <button onclick="submitPractice()">Submit</button> <button onclick="exitPractice()">Exit</button>
+      </div>
+      <p id="practiceFeedback" style="height: 1em; margin-top: 10px; opacity: 0.9"></p>
+    </div>
+
+    <div id="gameOver">
+      <h1>Game Over!</h1>
+      <p id="finalScore"></p>
+      <button onclick="startGame()">Play Again</button>
+    </div>
+
+    <script>
+      const monthlyThemes = {
+        0: {
+          name: "January",
+          emoji: "❄️",
+          bodyBg: "#e0f7fa",
+          headerBg: "#0288d1",
+          accentBg: "rgba(2,136,209,0.9)",
+          buttonBg: "#03a9f4",
+          textColor: "#000"
+        },
+        1: {
+          name: "February",
+          emoji: "❤️",
+          bodyBg: "#ffebee",
+          headerBg: "#c2185b",
+          accentBg: "rgba(194,24,91,0.9)",
+          buttonBg: "#e91e63",
+          textColor: "#000"
+        },
+        2: {
+          name: "March",
+          emoji: "☘️",
+          bodyBg: "#e8f5e9",
+          headerBg: "#2e7d32",
+          accentBg: "rgba(46,125,50,0.9)",
+          buttonBg: "#4caf50",
+          textColor: "#000"
+        },
+        3: {
+          name: "April",
+          emoji: "🌸",
+          bodyBg: "#f3e5f5",
+          headerBg: "#8e24aa",
+          accentBg: "rgba(142,36,170,0.9)",
+          buttonBg: "#9c27b0",
+          textColor: "#fff"
+        },
+        4: {
+          name: "May",
+          emoji: "🌼",
+          bodyBg: "#fffde7",
+          headerBg: "#f9a825",
+          accentBg: "rgba(249,168,37,0.9)",
+          buttonBg: "#ffeb3b",
+          textColor: "#000"
+        },
+        5: {
+          name: "June",
+          emoji: "☀️",
+          bodyBg: "#fff8e1",
+          headerBg: "#ff8f00",
+          accentBg: "rgba(255,143,0,0.9)",
+          buttonBg: "#ffc107",
+          textColor: "#000"
+        },
+        6: {
+          name: "July",
+          emoji: "🎆",
+          bodyBg: "#e3f2fd",
+          headerBg: "#1565c0",
+          accentBg: "rgba(21,101,192,0.9)",
+          buttonBg: "#2196f3",
+          textColor: "#000"
+        },
+        7: {
+          name: "August",
+          emoji: "🏖️",
+          bodyBg: "#fff3e0",
+          headerBg: "#ef6c00",
+          accentBg: "rgba(239,108,0,0.9)",
+          buttonBg: "#ff9800",
+          textColor: "#000"
+        },
+        8: {
+          name: "September",
+          emoji: "📚",
+          bodyBg: "#f3e5f5",
+          headerBg: "#6a1b9a",
+          accentBg: "rgba(106,27,154,0.9)",
+          buttonBg: "#9c27b0",
+          textColor: "#fff"
+        },
+        9: {
+          name: "October",
+          emoji: "🎃",
+          bodyBg: "#fbe9e7",
+          headerBg: "#d84315",
+          accentBg: "rgba(216,67,21,0.9)",
+          buttonBg: "#ff5722",
+          textColor: "#000"
+        },
+        10: {
+          name: "November",
+          emoji: "🦃",
+          bodyBg: "#efebe9",
+          headerBg: "#6d4c41",
+          accentBg: "rgba(109,76,65,0.9)",
+          buttonBg: "#795548",
+          textColor: "#000"
+        },
+        11: {
+          name: "December",
+          emoji: "❄️",
+          bodyBg: "#e1f5fe",
+          headerBg: "#0277bd",
+          accentBg: "rgba(2,119,189,0.9)",
+          buttonBg: "#03a9f4",
+          textColor: "#000"
+        }
+      };
+      const monthlyWords = {
+        0: [
+          "snow",
+          "ice",
+          "frost",
+          "chill",
+          "hibernate",
+          "cozy",
+          "blanket",
+          "sleigh",
+          "skate",
+          "mittens",
+          "fireplace",
+          "scarf",
+          "blizzard",
+          "winter",
+          "crystal",
+          "shiver",
+          "icicle",
+          "bundled",
+          "glacier",
+          "yule",
+          "pine",
+          "ember",
+          "north",
+          "star",
+          "solstice",
+          "hot cocoa",
+          "chimney",
+          "evergreen",
+          "sled",
+          "frostbite",
+          "flake",
+          "cold",
+          "nip",
+          "quick",
+          "silver",
+          "moonlit",
+          "sparkle",
+          "stillness",
+          "whisper"
+        ],
+        1: [
+          "love",
+          "heart",
+          "valentine",
+          "chocolate",
+          "rose",
+          "cupid",
+          "sweet",
+          "amor",
+          "romance",
+          "date",
+          "cherish",
+          "affection",
+          "gift",
+          "card",
+          "teddy",
+          "kiss",
+          "be mine",
+          "adore",
+          "passion",
+          "red",
+          "pink",
+          "bouquet",
+          "candle",
+          "dinner",
+          "embrace",
+          "forgiveness",
+          "friendship",
+          "poem",
+          "ribbon",
+          "dance",
+          "couple",
+          "sweets",
+          "spark",
+          "flirt",
+          "cupid’s arrow",
+          "sentiment",
+          "intimacy",
+          "roses",
+          "charm",
+          "dear"
+        ],
+        2: [
+          "shamrock",
+          "luck",
+          "green",
+          "leprechaun",
+          "rainbow",
+          "pot of gold",
+          "clover",
+          "March",
+          "emerald",
+          "celebrate",
+          "Irish",
+          "parade",
+          "festive",
+          "shillelagh",
+          "mirth",
+          "jig",
+          "harp",
+          "myth",
+          "legend",
+          "spring",
+          "breeze",
+          "fresh",
+          "meadow",
+          "moss",
+          "raindrop",
+          "sprout",
+          "growth",
+          "sheep",
+          "pasture",
+          "merry",
+          "cheer",
+          "golden",
+          "mystic",
+          "forest",
+          "music",
+          "dance",
+          "feast",
+          "gather",
+          "toast",
+          "greenery"
+        ],
+        3: [
+          "bloom",
+          "blossom",
+          "rain",
+          "shower",
+          "tulip",
+          "daffodil",
+          "garden",
+          "pastel",
+          "egg",
+          "bunny",
+          "chick",
+          "butterfly",
+          "nest",
+          "sprout",
+          "fresh",
+          "daisy",
+          "lily",
+          "petal",
+          "umbrella",
+          "puddle",
+          "rainbow",
+          "soft",
+          "light",
+          "rebirth",
+          "green",
+          "peace",
+          "picnic",
+          "dance",
+          "celebrate",
+          "joy",
+          "flutter",
+          "chirp",
+          "nestle",
+          "growth",
+          "ribbon",
+          "festive",
+          "Easter",
+          "pastel",
+          "cherry",
+          "mint"
+        ],
+        4: [
+          "bloom",
+          "flower",
+          "garden",
+          "butterfly",
+          "bee",
+          "bud",
+          "rose",
+          "lily",
+          "sunshine",
+          "warm",
+          "refresh",
+          "petal",
+          "maypole",
+          "festival",
+          "daffodil",
+          "bluebell",
+          "tulip",
+          "iris",
+          "pansy",
+          "daisy",
+          "meadow",
+          "picnic",
+          "fresh",
+          "green",
+          "renewal",
+          "vibrant",
+          "honey",
+          "lavender",
+          "blossom",
+          "scenery",
+          "buttercup",
+          "sunrise",
+          "dew",
+          "flutter",
+          "spire",
+          "ribbon",
+          "serene",
+          "smile",
+          "bright",
+          "festival"
+        ],
+        5: [
+          "sun",
+          "beach",
+          "ocean",
+          "wave",
+          "sand",
+          "surf",
+          "palm",
+          "tropic",
+          "heat",
+          "ice cream",
+          "vacation",
+          "holiday",
+          "sunburn",
+          "cooler",
+          "swim",
+          "float",
+          "deck",
+          "barbecue",
+          "picnic",
+          "lemonade",
+          "sunscreen",
+          "flip flop",
+          "towel",
+          "umbrella",
+          "pier",
+          "boat",
+          "sail",
+          "cruise",
+          "island",
+          "paradise",
+          "sunset",
+          "dusk",
+          "dawn",
+          "hammock",
+          "mango",
+          "pineapple",
+          "coconut",
+          "jellyfish",
+          "starfish",
+          "seashell"
+        ],
+        6: [
+          "fireworks",
+          "freedom",
+          "flag",
+          "barbecue",
+          "hotdog",
+          "picnic",
+          "parade",
+          "summer",
+          "sun",
+          "swim",
+          "patriotic",
+          "celebrate",
+          "sparkler",
+          "festival",
+          "camp",
+          "hike",
+          "tents",
+          "lake",
+          "river",
+          "campfire",
+          "marshmallow",
+          "grill",
+          "lemonade",
+          "ice",
+          "cold",
+          "friends",
+          "family",
+          "games",
+          "music",
+          "dance",
+          "tan",
+          "shorts",
+          "sunglasses",
+          "flip flops",
+          "beach",
+          "surf",
+          "boat",
+          "anchor",
+          "navy",
+          "stars"
+        ],
+        7: [
+          "sunset",
+          "tropical",
+          "palm",
+          "cocktail",
+          "wave",
+          "boardwalk",
+          "ice cream",
+          "festival",
+          "concert",
+          "roadtrip",
+          "camping",
+          "hiking",
+          "peak",
+          "valley",
+          "river",
+          "kayak",
+          "raft",
+          "picnic",
+          "bonfire",
+          "stargaze",
+          "meteor",
+          "sandcastle",
+          "bucket",
+          "shovel",
+          "shell",
+          "tide",
+          "breeze",
+          "mango",
+          "papaya",
+          "hibiscus",
+          "luau",
+          "grass skirt",
+          "drum",
+          "island",
+          "reef",
+          "dive",
+          "snorkel",
+          "surf",
+          "jet ski",
+          "paradise"
+        ],
+        8: [
+          "autumn",
+          "fall",
+          "leaves",
+          "crisp",
+          "school",
+          "book",
+          "apple",
+          "pumpkin",
+          "harvest",
+          "acorn",
+          "sweater",
+          "scarf",
+          "notebook",
+          "pencil",
+          "lecture",
+          "teacher",
+          "class",
+          "semester",
+          "study",
+          "library",
+          "backpack",
+          "chalkboard",
+          "desk",
+          "bell",
+          "recess",
+          "football",
+          "tailgate",
+          "hayride",
+          "corn",
+          "maze",
+          "cider",
+          "spice",
+          "cinnamon",
+          "orange",
+          "brown",
+          "gold",
+          "rust",
+          "maple",
+          "oak",
+          "pine"
+        ],
+        9: [
+          "pumpkin",
+          "ghost",
+          "spooky",
+          "witch",
+          "haunt",
+          "cobweb",
+          "candle",
+          "costume",
+          "mask",
+          "treat",
+          "trick",
+          "jack-o-lantern",
+          "skeleton",
+          "zombie",
+          "vampire",
+          "bat",
+          "cat",
+          "owl",
+          "moon",
+          "night",
+          "harvest",
+          "autumn",
+          "leaf",
+          "orange",
+          "black",
+          "purple",
+          "grave",
+          "tombstone",
+          "creepy",
+          "fear",
+          "haunted",
+          "castle",
+          "broom",
+          "potion",
+          "spell",
+          "wizard",
+          "cauldron",
+          "ghostly",
+          "cackle",
+          "midnight"
+        ],
+        10: [
+          "thanks",
+          "gratitude",
+          "harvest",
+          "turkey",
+          "pumpkin",
+          "pie",
+          "family",
+          "gather",
+          "feast",
+          "corn",
+          "cobweb",
+          "pilgrim",
+          "native",
+          "autumn",
+          "orange",
+          "brown",
+          "sweater",
+          "cranberry",
+          "sauce",
+          "stuffing",
+          "mashed",
+          "yams",
+          "celebrate",
+          "blessings",
+          "season",
+          "gratitude",
+          "thankful",
+          "harvest",
+          "festival",
+          "cider",
+          "spice",
+          "cinnamon",
+          "dry leaf",
+          "wind",
+          "coat",
+          "scarf",
+          "windy",
+          "cozy",
+          "ember",
+          "hayride"
+        ],
+        11: [
+          "snow",
+          "ice",
+          "winter",
+          "cold",
+          "chimney",
+          "gift",
+          "present",
+          "tree",
+          "ornament",
+          "lights",
+          "sleigh",
+          "reindeer",
+          "Santa",
+          "elf",
+          "mistletoe",
+          "wreath",
+          "carol",
+          "bell",
+          "star",
+          "angel",
+          "frost",
+          "icicle",
+          "candle",
+          "hot cocoa",
+          "cookie",
+          "gingerbread",
+          "stocking",
+          "sled",
+          "scarf",
+          "coat",
+          "glove",
+          "fireplace",
+          "cozy",
+          "family",
+          "celebrate",
+          "joy",
+          "peace",
+          "sparkle",
+          "midnight",
+          "noel"
+        ]
+      };
+      const specialPages = { hippopotomonstrosesquippedaliophobia: "pages/longWordsChallenge.html" };
+
+      let score = 0,
+        lives = 3,
+        gameActive = false,
+        words = [],
+        practiceWord = "";
+      let currentWordEl, currentTimer;
+
+      function applyMonthlyTheme(m = null) {
+        const month = m ?? new Date().getMonth();
+        const t = monthlyThemes[month];
+        if (!t) return;
+        document.body.style.backgroundColor = t.bodyBg;
+        document.body.style.color = t.textColor;
+        document.querySelector("header").style.backgroundColor = t.headerBg;
+        document.querySelectorAll("#mainMenu,#gameOver,#practiceMenu").forEach((el) => {
+          el.style.background = t.accentBg;
+          el.style.color = t.textColor;
+        });
+        document.querySelectorAll("button").forEach((b) => {
+          b.style.background = t.buttonBg;
+          b.style.color = t.textColor;
+        });
+        document.querySelectorAll(".word,#score,#lives,input").forEach((el) => (el.style.color = t.textColor));
+        document.querySelectorAll("input").forEach((i) => (i.style.borderColor = t.textColor));
+        document.title = `${t.name} Typing Challenge`;
+        document.querySelector("#mainMenu h1").textContent = `${t.emoji} ${t.name} Typing Challenge ${t.emoji}`;
+        document.querySelector("#gameOver h1").textContent = `${t.emoji} Game Over! ${t.emoji}`;
+        words = [...monthlyWords[month]];
+      }
+
+      function startGame() {
+        score = 0;
+        lives = 3;
+        gameActive = true;
+        document.getElementById("mainMenu").style.display = "none";
+        document.getElementById("practiceMenu").style.display = "none";
+        document.getElementById("gameOver").style.display = "none";
+        document.getElementById("score").textContent = `Words Typed: ${score}`;
+        document.getElementById("lives").textContent = "❤️".repeat(lives);
+        clearCurrentWord();
+        showNextWord();
+        spawnShamrocks();
+      }
+
+      function showNextWord() {
+        clearCurrentWord();
         if (!gameActive) return;
-        const blossom = document.createElement('div');
-        blossom.className = 'shamrock';
-        blossom.textContent = "🌸";
-        blossom.style.left = `${Math.random() * 100}vw`;
-        blossom.style.top = '100vh';
-        document.body.appendChild(blossom);
-        setTimeout(() => blossom.remove(), 5000);
-      }, 300);
-    }
+        const wordEl = document.createElement("div");
+        wordEl.className = "word";
+        const text = words[Math.floor(Math.random() * words.length)];
+        wordEl.textContent = text;
+        wordEl.style.left = `${Math.random() * (window.innerWidth - 100)}px`;
+        wordEl.style.top = `${Math.random() * (window.innerHeight - 50)}px`;
+        document.body.appendChild(wordEl);
+        currentWordEl = wordEl;
+        currentTimer = setTimeout(() => {
+          loseLife(wordEl);
+          showNextWord();
+        }, 3000);
+      }
 
-    window.addEventListener('keydown', function(event) {
-      if (!gameActive) return;
-
-      const wordsOnScreen = document.querySelectorAll('.word');
-      wordsOnScreen.forEach(wordEl => {
-        if (wordEl.textContent.startsWith(event.key)) {
-          wordEl.textContent = wordEl.textContent.slice(1);
-
-          if (wordEl.textContent === '') {
-            clearTimeout(wordEl.dataset.timer);
-            document.body.removeChild(wordEl);
+      window.addEventListener("keydown", (e) => {
+        if (!gameActive || !currentWordEl) return;
+        if (currentWordEl.textContent.startsWith(e.key)) {
+          currentWordEl.textContent = currentWordEl.textContent.slice(1);
+          if (!currentWordEl.textContent) {
+            clearTimeout(currentTimer);
+            currentWordEl.remove();
             score++;
-            document.getElementById('score').textContent = `Words Typed: ${score}`;
-            spawnWord();
+            document.getElementById("score").textContent = `Words Typed: ${score}`;
+            showNextWord();
           }
         }
       });
-    });
 
-    function loseLife(wordElement) {
-      if (wordElement) {
-        clearTimeout(wordElement.dataset.timer);
-        wordElement.remove();
+      function loseLife(w) {
+        if (w) w.remove();
+        lives--;
+        document.getElementById("lives").textContent = "❤️".repeat(lives);
+        if (lives <= 0) endGame();
       }
-      lives--;
-      document.getElementById('lives').textContent = '🌸'.repeat(lives);
-      if (lives <= 0) endGame();
-      else spawnWord();
-    }
 
-    function endGame() {
-      gameActive = false;
-      clearWords();
-      document.getElementById('finalScore').textContent = `Final Score: ${score}`;
-      document.getElementById('gameOver').style.display = 'block';
-    }
+      function clearCurrentWord() {
+        if (currentWordEl) {
+          clearTimeout(currentTimer);
+          currentWordEl.remove();
+          currentWordEl = null;
+        }
+      }
 
-    function clearWords() {
-      document.querySelectorAll('.word').forEach(word => {
-        clearTimeout(word.dataset.timer);
-        word.remove();
-      });
-    }
+      function spawnShamrocks() {
+        setInterval(() => {
+          if (!gameActive) return;
+          const b = document.createElement("div");
+          b.className = "shamrock";
+          b.textContent = monthlyThemes[new Date().getMonth()].emoji;
+          b.style.left = `${Math.random() * 100}vw`;
+          document.body.appendChild(b);
+          setTimeout(() => b.remove(), 5000);
+        }, 500);
+      }
 
-    window.onload = () => {
-      document.getElementById('mainMenu').style.display = 'block';
-    };
-  </script>
-</body>
+      // Practice & special handlers unchanged…
+      function handleSpecial() {
+        const v = document.getElementById("specialInput").value.trim().toLowerCase();
+        if (v === "practice") return showPractice();
+        if (specialPages[v]) window.location.href = specialPages[v];
+      }
+      function showPractice() {
+        gameActive = false;
+        clearCurrentWord();
+        document.getElementById("mainMenu").style.display = "none";
+        document.getElementById("practiceMenu").style.display = "block";
+        nextPractice();
+      }
+      function nextPractice() {
+        practiceWord = words[Math.floor(Math.random() * words.length)];
+        document.getElementById("practiceWord").textContent = practiceWord;
+        document.getElementById("practiceInput").value = "";
+        document.getElementById("practiceFeedback").textContent = "";
+      }
+      function submitPractice() {
+        const i = document.getElementById("practiceInput").value.trim();
+        if (i === practiceWord) nextPractice();
+        else document.getElementById("practiceFeedback").textContent = "Try again!";
+      }
+      function exitPractice() {
+        document.getElementById("practiceMenu").style.display = "none";
+        document.getElementById("mainMenu").style.display = "block";
+      }
+      function endGame() {
+        gameActive = false;
+        clearCurrentWord();
+        document.getElementById("finalScore").textContent = `Final Score: ${score}`;
+        document.getElementById("gameOver").style.display = "block";
+      }
+
+      window.onload = () => {
+        applyMonthlyTheme();
+        document.getElementById("mainMenu").style.display = "block";
+      };
+    </script>
+  </body>
 </html>
